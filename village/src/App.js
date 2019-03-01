@@ -22,18 +22,30 @@ class App extends Component {
   // Notice what your map function is looping over and returning inside of Smurfs.
   // You'll need to make sure you have the right properties on state and pass them down to props.
 
-  componentDidMount() {
+  async componentDidMount() {
+    try { 
+    let res = await axios.get('http://localhost:3333/smurfs')
+    this.setState({smurfs:res.data})
+    } catch (err){
+      console.log(err.message)
+    }
+   
+  }
+
+  deleteSmurf = (e,id) => {
+    e.preventDefault();
     axios
-      .get('http://localhost:3333/smurfs')
+      .delete(`http://localhost:3333/smurfs/${id}`)
       .then(res => {
-        console.log(res);
-        this.setState({ smurfs: res.data });
+        this.setState({
+          smurfs: res.data
+        });
       })
       .catch(err => {
         console.log(err);
         this.setState({ error: err });
       });
-  }
+  };
 
 
   render() {
@@ -45,7 +57,9 @@ class App extends Component {
         </nav>
         <Route exact path="/" render={ (props) => {
           return(<Smurfs {...props}
-          smurfs={this.state.smurfs}/>)
+          smurfs={this.state.smurfs}
+          deleteSmurf={this.deleteSmurf}
+        />)
         }} />
         <Route path="/smurf-form" component={SmurfForm} />
       </div>
@@ -54,3 +68,4 @@ class App extends Component {
 }
 
 export default App;
+
